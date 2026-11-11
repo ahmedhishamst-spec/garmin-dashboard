@@ -43,26 +43,10 @@ jobs:
       - name: Pull Garmin data (read-only, only new days)
         run: python pull.py --days 365
 
-      - name: Decide whether to publish
-        id: chg
-        run: |
-          NEW=$(find data -type f ! -name '_meta.json' | sort | xargs sha256sum | sha256sum | cut -d' ' -f1)
-          OLD=$(cat cache/last.hash 2>/dev/null || echo none)
-          NOW=$(date +%s)
-          LAST=$(cat cache/last.time 2>/dev/null || echo 0)
-          if [ "$NEW" != "$OLD" ] || [ $((NOW-LAST)) -gt 21600 ]; then
-            echo "publish=yes" >> "$GITHUB_OUTPUT"
-            echo "$NEW" > cache/last.hash
-            echo "$NOW" > cache/last.time
-          else
-            echo "publish=no" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Save history (encrypted)
         run: tar cz data | openssl enc -aes-256-cbc -pbkdf2 -salt -pass env:GARMIN_PERSONAL_API_KEY -out cache/data.enc
 
       - name: Build dashboard
-        if: steps.chg.outputs.publish == 'yes'
         run: |
           python build.py
           mkdir -p dist
@@ -70,7 +54,6 @@ jobs:
           printf '/*\n  X-Robots-Tag: noindex, nofollow\n  Cache-Control: no-store\n' > dist/_headers
 
       - name: Publish to Cloudflare Pages
-        if: steps.chg.outputs.publish == 'yes'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
