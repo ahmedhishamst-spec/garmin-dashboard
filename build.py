@@ -3,6 +3,7 @@
 no internet needed (the chart library is embedded from vendor/chart.umd.js)."""
 import json, os, sys
 from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
@@ -12,7 +13,7 @@ DEEP_TARGET_MIN = 90                      # deep sleep minutes that score 100
 WEIGHTS = {"hrv": 0.40, "deep": 0.35, "stress": 0.25}   # Recovery Score blend
 INTENSITY_GOAL = 150                      # weekly intensity minutes goal
 MIN_SESSION_MIN = 2                       # shorter activities are treated as noise
-# -----------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 
 
 def load(name, default=None):
@@ -265,7 +266,7 @@ if last_act:
     readout.append("Last recorded session: %s (%d days ago)." % (last_act, gap))
 
 payload = {
-    "built": datetime.now().strftime("%Y-%m-%d %H:%M"), "today": iso(today),
+    "built": datetime.now(ZoneInfo("Africa/Cairo")).strftime("%Y-%m-%d %H:%M") + " Cairo time", "today": iso(today),
     "first": dates[0], "last": dates[-1], "nDays": len(days),
     "days": days, "weekly": weekly, "sessions": sessions, "sports": sport_cards, "zones": zones,
     "score": latest, "score7": avg([x["score"] for x in last7], 0), "scorePrev7": avg([x["score"] for x in prev7], 0),
