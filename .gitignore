@@ -1,0 +1,5 @@
+.env.local
+data/
+dashboard.html
+dist/
+__pycache__/
