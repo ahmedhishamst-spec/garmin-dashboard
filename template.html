@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Executive Health Report</title>
+<style>
+:root{
+  --navy:#183159; --navy-deep:#0e1b33; --black:#07090d; --matte:#0b0e14;
+  --ti:#aeb4bd; --ti-dim:#7b838f; --ti-line:rgba(174,180,189,.18);
+  --gold:#f9b40a; --gold-soft:rgba(249,180,10,.14); --ink:#e9edf3; --muted:#98a1ae;
+  --radius:16px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink); background:var(--black);
+  background-image:
+    radial-gradient(1200px 520px at 50% -120px, rgba(24,49,89,.85), transparent 70%),
+    linear-gradient(180deg, #0a0f19 0%, #07090d 480px);
+  background-attachment:fixed;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  line-height:1.45; min-height:100vh;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:28px 16px 56px}
+h1,h2,h3,p{margin:0}
+.top{display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; margin-bottom:22px}
+.tag{display:inline-block; font-size:11px; letter-spacing:.28em; color:var(--gold); font-weight:600}
+h1{font-size:34px; font-weight:300; letter-spacing:.02em; margin-top:6px}
+#sub{color:var(--muted); font-size:13px; margin-top:4px}
+.range{display:flex; gap:6px; padding:4px; border:1px solid var(--ti-line); border-radius:999px; background:rgba(255,255,255,.02)}
+.range button{
+  appearance:none; border:0; background:transparent; color:var(--muted); font:inherit; font-size:12px;
+  letter-spacing:.08em; padding:7px 14px; border-radius:999px; cursor:pointer;
+}
+.range button.on{background:var(--gold); color:#1a1300; font-weight:600}
+.card{
+  position:relative; border:1px solid var(--ti-line); border-radius:var(--radius); padding:20px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 4px),
+    linear-gradient(160deg, rgba(24,49,89,.38), rgba(11,14,20,.92) 62%);
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 18px 40px rgba(0,0,0,.35);
+}
+.card::before{
+  content:""; position:absolute; left:18px; right:18px; top:0; height:1px;
+  background:linear-gradient(90deg, transparent, rgba(215,220,228,.55), transparent);
+}
+.card h3{font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--ti); font-weight:600; margin-bottom:4px}
+.card .hint{font-size:12px; color:var(--muted); margin-bottom:12px}
+.grid{display:grid; gap:16px}
+.hero{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+section{margin-top:34px}
+.sec-h{display:flex; align-items:center; gap:12px; margin-bottom:14px}
+.sec-h .num{
+  width:30px; height:30px; border-radius:50%; border:1px solid var(--gold); color:var(--gold);
+  display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600;
+}
+.sec-h h2{font-size:20px; font-weight:400; letter-spacing:.03em}
+.sec-h .rule{flex:1; height:1px; background:linear-gradient(90deg, var(--ti-line), transparent)}
+
+/* watch face */
+.watch{display:flex; gap:22px; align-items:center; flex-wrap:wrap; justify-content:center}
+.face{position:relative; width:250px; height:250px; flex:0 0 auto}
+.face svg{width:100%; height:100%; display:block}
+.bezel{fill:none; stroke:url(#ti); stroke-width:3}
+.track{fill:none; stroke:rgba(174,180,189,.14); stroke-width:10}
+#arc{fill:none; stroke:url(#gold); stroke-width:10; stroke-linecap:round; transition:stroke-dasharray .8s ease}
+.tk{stroke:rgba(174,180,189,.35); stroke-width:1}
+.tk.l{stroke:rgba(215,220,228,.8); stroke-width:2}
+.dial{fill:url(#dialg)}
+.face .mid{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 46px}
+.face .lbl{font-size:9px; letter-spacing:.22em; color:var(--ti); font-weight:600; max-width:120px}
+.face .big{font-size:64px; font-weight:200; line-height:1; margin:6px 0 4px; letter-spacing:-.02em}
+.face .state{font-size:12px; letter-spacing:.2em; color:var(--gold); font-weight:600; text-transform:uppercase}
+.wside{flex:1 1 210px; min-width:200px}
+.pill{display:inline-block; font-size:12px; padding:4px 10px; border-radius:999px; border:1px solid var(--ti-line); color:var(--ink)}
+.pill.up{border-color:rgba(249,180,10,.5); color:var(--gold)}
+.comp{margin-top:14px}
+.comp .row{display:grid; grid-template-columns:86px 1fr 30px; gap:10px; align-items:center; font-size:12px; color:var(--muted); margin:8px 0}
+.bar{height:6px; border-radius:999px; background:rgba(174,180,189,.14); overflow:hidden}
+.bar>i{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#b8bdc6,var(--gold))}
+.note{font-size:11.5px; color:var(--muted); margin-top:12px}
+
+/* fitness age */
+.agehead{display:flex; align-items:flex-end; gap:22px; flex-wrap:wrap}
+.num-xl{font-size:64px; font-weight:200; line-height:1; letter-spacing:-.02em}
+.num-xl small{font-size:15px; color:var(--muted); letter-spacing:.05em; margin-left:4px}
+.vs{display:flex; flex-direction:column; gap:2px; padding-bottom:8px}
+.vs b{font-size:26px; font-weight:300; color:var(--ti)}
+.vs span{font-size:11px; letter-spacing:.16em; color:var(--muted); text-transform:uppercase}
+.lever{display:grid; grid-template-columns:1fr auto; gap:4px 10px; font-size:12.5px; color:var(--muted); margin-top:12px}
+.lever .bar{grid-column:1 / -1}
+.lever b{color:var(--ink); font-weight:500}
+.spark{height:64px; margin-top:12px}
+
+/* kpis */
+.kpi .v{font-size:36px; font-weight:200; letter-spacing:-.01em; margin-top:6px}
+.kpi .v small{font-size:13px; color:var(--muted); margin-left:4px; letter-spacing:.04em}
+.kpi .s{font-size:12px; color:var(--muted); margin-top:2px}
+.chart{position:relative; height:260px}
+.chart.tall{height:300px}
+.chart.short{height:200px}
+.stat{display:flex; flex-direction:column; gap:2px}
+.stat b{font-size:28px; font-weight:200}
+.stat span{font-size:12px; color:var(--muted)}
+.read{list-style:none; padding:0; margin:0}
+.read li{padding:9px 0 9px 20px; position:relative; font-size:13.5px; border-bottom:1px solid var(--ti-line); color:var(--ink)}
+.read li:last-child{border:0}
+.read li::before{content:""; position:absolute; left:2px; top:16px; width:8px; height:8px; border-radius:50%; background:var(--gold)}
+.sport{display:flex; flex-direction:column; gap:4px}
+.sport .n{font-size:30px; font-weight:200}
+.sport .t{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--ti)}
+.sport .m{font-size:12px; color:var(--muted)}
+.empty{color:var(--muted); font-size:12.5px; border:1px dashed var(--ti-line); border-radius:12px; padding:12px}
+.tablewrap{overflow-x:auto; -webkit-overflow-scrolling:touch}
+table{width:100%; border-collapse:collapse; font-size:13px; min-width:640px}
+th{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--ti); text-align:left; font-weight:600; padding:8px 10px; border-bottom:1px solid var(--ti-line)}
+td{padding:9px 10px; border-bottom:1px solid rgba(174,180,189,.08); white-space:nowrap}
+tr.noise td{color:var(--ti-dim)}
+.chip{display:inline-block; padding:2px 9px; border-radius:999px; font-size:11px; border:1px solid var(--ti-line)}
+.chip.Calisthenics{border-color:rgba(249,180,10,.55); color:var(--gold)}
+footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--ti-line); font-size:12px; color:var(--muted)}
+footer p{margin:6px 0; max-width:900px}
+
+@media (max-width:900px){
+  .hero,.g2{grid-template-columns:1fr}
+  .g3{grid-template-columns:1fr 1fr}
+  .g4{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){
+  .wrap{padding:20px 16px 44px}
+  h1{font-size:28px}
+  .g3,.g4{grid-template-columns:1fr 1fr}
+  .face{width:220px; height:220px}
+  .face .big{font-size:54px}
+  .num-xl{font-size:54px}
+  .chart{height:230px}
+  .card{padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div>
+    <span class="tag">EXECUTIVE HEALTH REPORT</span>
+    <h1>Ahmed Hisham</h1>
+    <p id="sub"></p>
+  </div>
+  <div class="range" id="range">
+    <button data-r="30">30D</button><button data-r="90">90D</button><button data-r="0">ALL</button>
+  </div>
+</header>
+
+<div class="grid hero">
+  <div class="card watch">
+    <div class="face">
+      <svg viewBox="0 0 240 240" aria-hidden="true">
+        <defs>
+          <linearGradient id="ti" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e3e7ec"/><stop offset=".5" stop-color="#8d949f"/><stop offset="1" stop-color="#cfd4db"/></linearGradient>
+          <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd36b"/><stop offset="1" stop-color="#f9b40a"/></linearGradient>
+          <radialGradient id="dialg" cx=".5" cy=".38" r=".8"><stop offset="0" stop-color="#1d3a69"/><stop offset=".7" stop-color="#0d1a30"/><stop offset="1" stop-color="#080b12"/></radialGradient>
+        </defs>
+        <circle cx="120" cy="120" r="119" class="bezel"/>
+        <circle cx="120" cy="120" r="104" class="dial"/>
+        <g id="ticks"></g>
+        <circle cx="120" cy="120" r="94" class="track"/>
+        <circle id="arc" cx="120" cy="120" r="94" transform="rotate(-90 120 120)" stroke-dasharray="0 600"/>
+      </svg>
+      <div class="mid">
+        <div class="lbl">EXECUTIVE RECOVERY SCORE</div>
+        <div class="big" id="scoreBig">-</div>
+        <div class="state" id="scoreState"></div>
+      </div>
+    </div>
+    <div class="wside">
+      <h3>Testosterone readiness</h3>
+      <p class="hint" id="scoreSub"></p>
+      <div class="comp" id="comp"></div>
+      <p class="note">An inferred indicator built from HRV, deep sleep and stress. It is not a hormone measurement.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Biological / Fitness Age</h3>
+    <p class="hint" id="ageSub"></p>
+    <div class="agehead">
+      <div class="num-xl" id="faBig">-<small>yrs</small></div>
+      <div class="vs"><b id="chrono">-</b><span>Chronological (Garmin)</span></div>
+      <div class="vs"><b id="best">-</b><span>Achievable</span></div>
+    </div>
+    <div style="margin-top:10px"><span class="pill up" id="faDelta"></span></div>
+    <div id="levers"></div>
+    <div class="spark"><canvas id="cFa"></canvas></div>
+  </div>
+</div>
+
+<div class="grid g4" id="kpis" style="margin-top:16px"></div>
+
+<div class="grid g2" style="margin-top:16px">
+  <div class="card">
+    <h3>Recovery trend</h3>
+    <p class="hint">Daily Executive Recovery Score (0 to 100)</p>
+    <div class="chart"><canvas id="cScore"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Read-out</h3>
+    <p class="hint">What the numbers say right now</p>
+    <ul class="read" id="readout"></ul>
+  </div>
+</div>
+
+<section>
+  <div class="sec-h"><span class="num">1</span><h2>Waistline Reduction</h2><span class="rule"></span></div>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Daily energy: resting vs active</h3>
+      <p class="hint">kcal per day. Resting (BMR) in titanium, active in gold.</p>
+      <div class="chart"><canvas id="cEnergy"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Intensity minutes per week</h3>
+      <p class="hint" id="intHint"></p>
+      <div class="chart"><canvas id="cInt"></canvas></div>
+    </div>
+  </div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card stat" id="stActive"></div>
+    <div class="card stat" id="stWeight"></div>
+    <div class="card">
+      <h3>Fasting windows</h3>
+      <p class="hint">Not available from Garmin</p>
+      <div class="empty">Garmin's Personal API does not expose fasting or meal timing, so nothing is shown here instead of an estimate.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h"><span class="num">2</span><h2>Sleep Architecture &amp; HRV</h2><span class="rule"></span></div>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Sleep stages</h3>
+      <p class="hint">Hours per night: deep, REM, light and awake</p>
+      <div class="chart tall"><canvas id="cSleep"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Deep sleep</h3>
+      <p class="hint" id="deepHint"></p>
+      <div class="chart tall"><canvas id="cDeep"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Heart rate variability</h3>
+      <p class="hint">Overnight average (ms) with your Garmin balanced range</p>
+      <div class="chart tall"><canvas id="cHrv"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Body Battery and resting heart rate</h3>
+      <p class="hint">Daily high and low (left), resting HR in bpm (right)</p>
+      <div class="chart tall"><canvas id="cBb"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h"><span class="num">3</span><h2>Training Volume</h2><span class="rule"></span></div>
+  <div class="grid g4" id="sports"></div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <h3>Weekly training minutes</h3>
+      <p class="hint">By sport, Monday to Sunday</p>
+      <div class="chart"><canvas id="cWeek"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Heart rate zones</h3>
+      <p class="hint">Total minutes across all sessions</p>
+      <div class="chart"><canvas id="cZones"></canvas></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>Sessions</h3>
+    <p class="hint">Timed Activity is counted as Home Calisthenics. Sessions under 2 minutes are dimmed and excluded from totals.</p>
+    <div class="tablewrap"><table id="tbl"></table></div>
+  </div>
+</section>
+
+<footer>
+  <p><b>How the Recovery Score works.</b> Each morning it blends three signals: last night's HRV against your own average (40%), deep sleep minutes against a 90 minute target (35%), and yesterday's average stress (25%). If one signal is missing, the others are re-weighted. Bands: 75+ Prime, 55 to 74 Ready, 40 to 54 Moderate, below 40 Recover.</p>
+  <p>Data covers <span id="cover"></span> and stays on this computer. Active calories, intensity minutes and weight come from Garmin as recorded. Weight entries may be manual.</p>
+</footer>
+</div>
+
+<script>/*__CHARTJS__*/</script>
+<script>
+(function(){
+const P = /*__PAYLOAD__*/null;
+const $ = id => document.getElementById(id);
+const f = (v,d) => v==null ? '-' : Number(v).toFixed(d||0);
+const C = {gold:'#f9b40a', gold2:'#ffd36b', ti:'#aeb4bd', tiDim:'#7b838f', ink:'#e9edf3', blue:'#5b84c4',
+           grid:'rgba(174,180,189,.10)', dim:'#3b4556', navy:'#183159'};
+if (typeof Chart === 'undefined') { document.body.insertAdjacentHTML('afterbegin','<p style="padding:20px">Chart library missing. Re-run build.py.</p>'); return; }
+Chart.defaults.color = '#98a1ae';
+Chart.defaults.font.family = '-apple-system, "SF Pro Text", "Helvetica Neue", Arial, sans-serif';
+Chart.defaults.font.size = 11;
+
+const band = s => s==null ? '' : s>=75 ? 'Prime' : s>=55 ? 'Ready' : s>=40 ? 'Moderate' : 'Recover';
+const tipStyle = {backgroundColor:'#0a0f19', borderColor:'rgba(249,180,10,.45)', borderWidth:1, titleColor:'#f9b40a', bodyColor:'#e9edf3', padding:10};
+function opts(o){
+  const base = {responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false},
+    plugins:{legend:{labels:{usePointStyle:true, boxWidth:8, boxHeight:8}}, tooltip:tipStyle},
+    scales:{x:{grid:{display:false}, ticks:{maxRotation:0, autoSkip:true, maxTicksLimit:8}},
+            y:{grid:{color:C.grid}, beginAtZero:true, border:{display:false}}}};
+  return Object.assign(base, o||{});
+}
+
+/* ---------- static header ---------- */
+function header(){
+  $('sub').textContent = 'Data ' + P.first + ' to ' + P.last + ' (' + P.nDays + ' days) | Built ' + P.built;
+  $('cover').textContent = P.first + ' to ' + P.last + ' (' + P.nDays + ' days with measurements)';
+  // watch face
+  let t=''; for (let i=0;i<60;i++){ const a=i*6*Math.PI/180, L=i%5===0, r1=L?106:110, r2=116;
+    t += '<line class="tk'+(L?' l':'')+'" x1="'+(120+r1*Math.sin(a)).toFixed(2)+'" y1="'+(120-r1*Math.cos(a)).toFixed(2)+'" x2="'+(120+r2*Math.sin(a)).toFixed(2)+'" y2="'+(120-r2*Math.cos(a)).toFixed(2)+'"/>'; }
+  $('ticks').innerHTML = t;
+  const s = P.score ? P.score.score : null, circ = 2*Math.PI*94;
+  $('arc').setAttribute('stroke-dasharray', (s==null?0:circ*s/100).toFixed(1)+' '+circ.toFixed(1));
+  $('scoreBig').textContent = s==null ? '-' : s;
+  $('scoreState').textContent = band(s);
+  if (P.score){
+    const d = (P.score7!=null && P.scorePrev7!=null) ? (P.score7-P.scorePrev7) : null;
+    $('scoreSub').textContent = 'For ' + P.score.d + '. 7-day average ' + f(P.score7) + (d==null ? '' : ' (' + (d>=0?'+':'') + d.toFixed(0) + ' vs prior week)') + '.';
+    const rows = [['HRV',P.score.cHrv,'hrv'],['Deep sleep',P.score.cDeep,'deep'],['Stress',P.score.cStress,'stress']];
+    $('comp').innerHTML = rows.map(r => '<div class="row"><span>'+r[0]+' <span style="color:#6c7480">'+Math.round(P.weights[r[2]]*100)+'%</span></span><div class="bar"><i style="width:'+(r[1]==null?0:r[1])+'%"></i></div><span style="text-align:right">'+(r[1]==null?'-':r[1])+'</span></div>').join('');
+  } else { $('scoreSub').textContent = 'Not enough overlapping data yet.'; }
+
+  // fitness age
+  const fa = P.fa;
+  if (fa){
+    $('faBig').innerHTML = fa.fitness.toFixed(1) + '<small>yrs</small>';
+    $('chrono').textContent = fa.chrono!=null ? fa.chrono : '-';
+    $('best').textContent = fa.best ? fa.best.toFixed(1) : '-';
+    $('ageSub').textContent = 'Garmin estimate as of ' + fa.date + '.';
+    if (fa.chrono!=null){ const d = fa.chrono - fa.fitness;
+      $('faDelta').textContent = d>=0 ? d.toFixed(1)+' years younger than your chronological age' : (-d).toFixed(1)+' years older than your chronological age'; }
+    const L=[];
+    if (fa.vigMin!=null) L.push(['Vigorous minutes per week', Math.round(fa.vigMin)+' of '+Math.round(fa.vigMinTarget||75), fa.vigMin/(fa.vigMinTarget||75)]);
+    if (fa.vigDays!=null) L.push(['Vigorous days per week', fa.vigDays.toFixed(1)+' of '+(fa.vigDaysTarget||3), fa.vigDays/(fa.vigDaysTarget||3)]);
+    if (fa.rhr!=null) L.push(['Resting heart rate', Math.round(fa.rhr)+' bpm', null]);
+    $('levers').innerHTML = L.map(l => '<div class="lever"><span>'+l[0]+'</span><b>'+l[1]+'</b>'+(l[2]==null?'':'<div class="bar"><i style="width:'+Math.min(100,Math.max(2,l[2]*100))+'%"></i></div>')+'</div>').join('');
+  } else { $('ageSub').textContent = 'No Fitness Age data yet.'; }
+
+  // KPIs
+  const k = P.kpi, hb = k.hrvBase;
+  const cards = [
+    ['Deep sleep', f(k.deep7), 'min', '7-night average, target '+P.deepTarget],
+    ['HRV', f(k.hrv7), 'ms', (k.hrvStatus ? 'Status ' + k.hrvStatus.toLowerCase() : '7-night average') + (hb ? ', range '+hb.balancedLow+' to '+hb.balancedUpper : '')],
+    ['Resting HR', f(k.rhr), 'bpm', '7-day average ' + f(k.rhr7)],
+    ['Stress', f(k.stress7), '/100', '7-day average, sleep ' + f(k.sleepH7,1) + ' h']
+  ];
+  $('kpis').innerHTML = cards.map(c => '<div class="card kpi"><h3>'+c[0]+'</h3><div class="v">'+c[1]+'<small>'+c[2]+'</small></div><div class="s">'+c[3]+'</div></div>').join('');
+  $('readout').innerHTML = P.readout.map(x => '<li>'+x+'</li>').join('');
+  $('intHint').textContent = 'Moderate plus vigorous (counted twice). Weekly goal ' + P.intGoal + '. This week: ' + k.thisWeekIntTotal + '.';
+  $('deepHint').textContent = 'Minutes per night against a ' + P.deepTarget + ' minute target, with deep sleep as a share of the night (right)';
+
+  $('stActive').innerHTML = '<h3>Active calories</h3><b>'+f(k.active7)+' <span style="font-size:13px;color:var(--muted)">kcal/day</span></b><span>7-day average'+(k.activePrev?', previous week '+f(k.activePrev):'')+'. Resting '+f(k.bmr7)+' kcal. Steps '+f(k.steps7)+'.</span>';
+  const w = k.weight;
+  $('stWeight').innerHTML = '<h3>Weight</h3>' + (w ? '<b>'+w.kg.toFixed(1)+' <span style="font-size:13px;color:var(--muted)">kg</span></b><span>'+w.d+(w.delta!=null?'. Change since '+w.first+': '+(w.delta>0?'+':'')+w.delta.toFixed(1)+' kg':'')+'. Entries may be manual.</span>' : '<span>No weight entries yet.</span>');
+
+  // sports
+  $('sports').innerHTML = P.sportsList.map(n => { const s = P.sports[n];
+    return '<div class="card sport"><span class="t">'+n+'</span><span class="n">'+s.n30+'</span><span class="m">sessions in the last 30 days, '+s.min30+' min</span><span class="m">All time: '+s.nAll+' sessions, '+s.minAll+' min</span></div>'; }).join('');
+
+  // sessions table
+  let h = '<thead><tr><th>Date</th><th>Sport</th><th>Garmin name</th><th>Min</th><th>Avg HR</th><th>Max HR</th><th>kcal</th><th>Load</th><th>Km</th></tr></thead><tbody>';
+  h += P.sessions.map(s => '<tr'+(s.noise?' class="noise"':'')+'><td>'+s.d.replace('T',' ')+'</td><td><span class="chip '+s.sport.replace(' ','')+'">'+s.sport+'</span></td><td>'+(s.name||'')+'</td><td>'+f(s.min,1)+'</td><td>'+f(s.hr)+'</td><td>'+f(s.maxhr)+'</td><td>'+f(s.kcal)+'</td><td>'+f(s.load)+'</td><td>'+(s.km? s.km.toFixed(2):'-')+'</td></tr>').join('');
+  $('tbl').innerHTML = h + '</tbody>';
+}
+
+/* ---------- charts ---------- */
+let charts = [];
+function mk(id, cfg){ const c = new Chart($(id), cfg); charts.push(c); return c; }
+function renderCharts(range){
+  charts.forEach(c => c.destroy()); charts = [];
+  const days = range ? P.days.slice(-range) : P.days;
+  const L = days.map(d => d.d.slice(5));
+  const wk = range ? P.weekly.slice(-(Math.ceil(range/7)+1)) : P.weekly;
+  const WL = wk.map(w => w.w.slice(5));
+  const col = k => days.map(d => d[k]);
+
+  mk('cScore', {type:'line', data:{labels:L, datasets:[
+    {label:'Recovery score', data:col('score'), borderColor:C.gold, backgroundColor:'rgba(249,180,10,.12)', fill:true, tension:.3, pointRadius:2.5, pointBackgroundColor:C.gold, spanGaps:true}]},
+    options:opts({plugins:{legend:{display:false}, tooltip:tipStyle}, scales:{x:{grid:{display:false}, ticks:{maxTicksLimit:8, maxRotation:0}}, y:{min:0, max:100, grid:{color:C.grid}, border:{display:false}}}})});
+
+  mk('cEnergy', {type:'bar', data:{labels:L, datasets:[
+    {label:'Resting (BMR)', data:col('bmr'), backgroundColor:'rgba(174,180,189,.55)', stack:'e'},
+    {label:'Active', data:col('active'), backgroundColor:C.gold, stack:'e'}]},
+    options:opts({scales:{x:{stacked:true, grid:{display:false}, ticks:{maxTicksLimit:8, maxRotation:0}}, y:{stacked:true, grid:{color:C.grid}, border:{display:false}}}})});
+
+  mk('cInt', {type:'bar', data:{labels:WL, datasets:[
+    {label:'Moderate', data:wk.map(w=>w.mod), backgroundColor:'rgba(174,180,189,.6)', stack:'i'},
+    {label:'Vigorous x2', data:wk.map(w=>w.vig*2), backgroundColor:C.gold, stack:'i'},
+    {label:'Goal', data:wk.map(()=>P.intGoal), type:'line', borderColor:'#e9edf3', borderDash:[6,5], pointRadius:0, borderWidth:1.5}]},
+    options:opts({scales:{x:{stacked:true, grid:{display:false}, title:{display:true, text:'Week starting'}}, y:{stacked:true, grid:{color:C.grid}, border:{display:false}}}})});
+
+  mk('cSleep', {type:'bar', data:{labels:L, datasets:[
+    {label:'Deep', data:days.map(d=>d.deep==null?null:+(d.deep/60).toFixed(2)), backgroundColor:C.gold, stack:'s'},
+    {label:'REM', data:days.map(d=>d.rem==null?null:+(d.rem/60).toFixed(2)), backgroundColor:C.blue, stack:'s'},
+    {label:'Light', data:days.map(d=>d.light==null?null:+(d.light/60).toFixed(2)), backgroundColor:'rgba(174,180,189,.55)', stack:'s'},
+    {label:'Awake', data:days.map(d=>d.awake==null?null:+(d.awake/60).toFixed(2)), backgroundColor:C.dim, stack:'s'}]},
+    options:opts({scales:{x:{stacked:true, grid:{display:false}, ticks:{maxTicksLimit:8, maxRotation:0}}, y:{stacked:true, grid:{color:C.grid}, border:{display:false}, title:{display:true, text:'hours'}}}})});
+
+  mk('cDeep', {type:'bar', data:{labels:L, datasets:[
+    {label:'Deep sleep (min)', data:col('deep'), backgroundColor:'rgba(249,180,10,.85)', borderRadius:3, yAxisID:'y'},
+    {label:'Target', data:L.map(()=>P.deepTarget), type:'line', borderColor:'#e9edf3', borderDash:[6,5], pointRadius:0, borderWidth:1.5, yAxisID:'y'},
+    {label:'Deep share (%)', data:col('deepPct'), type:'line', borderColor:C.ti, pointRadius:2, tension:.3, spanGaps:true, yAxisID:'y2'}]},
+    options:opts({scales:{x:{grid:{display:false}, ticks:{maxTicksLimit:8, maxRotation:0}}, y:{grid:{color:C.grid}, beginAtZero:true, border:{display:false}},
+      y2:{position:'right', grid:{display:false}, beginAtZero:true, max:40, ticks:{callback:v=>v+'%'}}}})});
+
+  const hb = P.kpi.hrvBase;
+  const hd = [
+    {label:'Nightly HRV', data:col('hrv'), borderColor:C.gold, backgroundColor:C.gold, pointRadius:3, tension:.25, spanGaps:true, borderWidth:2},
+    {label:'7-day avg (Garmin)', data:col('hrvWeekly'), borderColor:C.ti, pointRadius:0, tension:.3, spanGaps:true, borderWidth:1.5}];
+  if (hb){
+    hd.push({label:'Balanced upper', data:L.map(()=>hb.balancedUpper), borderColor:'rgba(249,180,10,.35)', borderDash:[4,4], pointRadius:0, borderWidth:1});
+    hd.push({label:'Balanced lower', data:L.map(()=>hb.balancedLow), borderColor:'rgba(249,180,10,.35)', borderDash:[4,4], pointRadius:0, borderWidth:1, fill:'-1', backgroundColor:'rgba(249,180,10,.07)'});
+  }
+  mk('cHrv', {type:'line', data:{labels:L, datasets:hd}, options:opts({scales:{x:{grid:{display:false}, ticks:{maxTicksLimit:8, maxRotation:0}}, y:{grid:{color:C.grid}, beginAtZero:false, border:{display:false}}}})});
+
+  mk('cBb', {type:'line', data:{labels:L, datasets:[
+    {label:'Body Battery high', data:col('bbHigh'), borderColor:C.gold, pointRadius:0, tension:.3, spanGaps:true, yAxisID:'y'},
+    {label:'Body Battery low', data:col('bbLow'), borderColor:C.blue, pointRadius:0, tension:.3, spanGaps:true, yAxisID:'y'},
+    {label:'Resting HR', data:col('rhr'), borderColor:C.ti, borderDash:[5,4], pointRadius:0, tension:.3, spanGaps:true, yAxisID:'y2'}]},
+    options:opts({scales:{x:{grid:{display:false}, ticks:{maxTicksLimit:8, maxRotation:0}}, y:{min:0, max:100, grid:{color:C.grid}, border:{display:false}},
+      y2:{position:'right', grid:{display:false}, suggestedMin:40, suggestedMax:80}}})});
+
+  const sc = {Calisthenics:C.gold, Padel:'#e4e7ec', Cardio:C.blue, 'Gym Strength':'#8b93a1'};
+  mk('cWeek', {type:'bar', data:{labels:WL, datasets:P.sportsList.map(n => ({label:n, data:wk.map(w=>w.train[n]), backgroundColor:sc[n], stack:'t'}))},
+    options:opts({scales:{x:{stacked:true, grid:{display:false}, title:{display:true, text:'Week starting'}}, y:{stacked:true, grid:{color:C.grid}, border:{display:false}, title:{display:true, text:'minutes'}}}})});
+
+  mk('cZones', {type:'bar', data:{labels:['Z1 Warm-up','Z2 Easy','Z3 Aerobic','Z4 Threshold','Z5 Max'], datasets:[
+    {label:'Minutes', data:P.zones, backgroundColor:['#6b7380','#8e96a3','#b9bec7','#f2c04a','#f9b40a'], borderRadius:4}]},
+    options:opts({indexAxis:'y', plugins:{legend:{display:false}, tooltip:tipStyle}, scales:{x:{grid:{color:C.grid}, border:{display:false}}, y:{grid:{display:false}}}})});
+}
+
+function fa(){
+  if (!P.fa || !P.fa.series.length) return;
+  new Chart($('cFa'), {type:'line', data:{labels:P.fa.series.map(s=>s.d.slice(5)), datasets:[
+    {data:P.fa.series.map(s=>s.v), borderColor:C.gold, backgroundColor:'rgba(249,180,10,.12)', fill:true, tension:.3, pointRadius:2}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:tipStyle}, scales:{x:{display:false}, y:{display:false}}}});
+}
+
+header(); fa();
+let range = P.nDays > 90 ? 90 : 0;
+function setRange(r){ range = r; document.querySelectorAll('#range button').forEach(b => b.classList.toggle('on', +b.dataset.r === r)); renderCharts(r); }
+document.querySelectorAll('#range button').forEach(b => b.addEventListener('click', () => setRange(+b.dataset.r)));
+setRange(range);
+})();
+</script>
+</body>
+</html>
